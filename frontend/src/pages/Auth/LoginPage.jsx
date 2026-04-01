@@ -20,13 +20,14 @@ const LoginPage = () => {
         setError('');
         setLoading(true);
         try {
-            const { token, user } = await authService.login(email, password);
-            login(user, token);
+            const { token, data } = await authService.login(email, password);
+            login(data.user, token);
             toast.success('Logged in successfully!');
             navigate('/dashboard');
         } catch (err) {
-            setError(err.message || 'Failed to login. Please check your credentials.');
-            toast.error(err.message || 'Failed to login.');
+            const message = err.error || err.message || 'Failed to login. Please check your credentials.';
+            setError(message);
+            toast.error(message);
         } finally {
             setLoading(false);
         }

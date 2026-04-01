@@ -20,13 +20,14 @@ const RegisterPage = () => {
         setError('');
         setLoading(true);
         try {
-            const { token, user } = await authService.register(username, email, password);
-            login(user, token);
+            const { token, data } = await authService.register(username, email, password);
+            login(data.user, token);
             toast.success('Account created successfully!');
             navigate('/dashboard');
         } catch (err) {
-            setError(err.message || 'Failed to register. Please try again.');
-            toast.error(err.message || 'Failed to register.');
+            const message = err.error || err.message || 'Failed to register. Please try again.';
+            setError(message);
+            toast.error(message);
         } finally {
             setLoading(false);
         }
