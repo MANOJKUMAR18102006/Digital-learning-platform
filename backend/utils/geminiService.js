@@ -1,9 +1,9 @@
 import dotenv from 'dotenv';
-import { GoogleGenAI } from 'google/genai';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 dotenv.config();
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+const ai = new GoogleGenerativeAI({ apiKey: process.env.GEMINI_API_KEY });
 if (!process.env.GEMINI_API_KEY) {
     console.error('FATAL ERROR: GEMINI_API_KEY is not set in the environment variables.');
     process.exit(1);
@@ -28,12 +28,10 @@ export const generateFlashcards = async (text, count = 10) => {
     `;
 
         const truncatedText = text.substring(0, 1500);
-        const response = await ai.models.generateContent({
-            model: "gemini-2.5-flash-lite",
-            contents: prompt + truncatedText,
-        });
+        const model = ai.getGenerativeModel({ model: "gemini-1.5-flash" });
+        const response = await model.generateContent(prompt + truncatedText);
 
-        const generatedText = response.text;
+        const generatedText = response.response.text();
 
         // Parse the response
         const flashcards = [];
@@ -87,12 +85,10 @@ D: [Difficulty: easy, medium, or hard]
 
 Separate questions with "----"`;
 
-        const response = await ai.models.generateContent({
-            model: "gemini-2.5-flash-lite",
-            contents: prompt + text.substring(0, 2000),
-        });
+        const model = ai.getGenerativeModel({ model: "gemini-1.5-flash" });
+        const response = await model.generateContent(prompt + text.substring(0, 2000));
 
-        const generatedText = response.text;
+        const generatedText = response.response.text();
         const questions = [];
         const questionBlocks = generatedText.split('----').filter(q => q.trim());
 
@@ -141,11 +137,9 @@ export const generateSummary = async (text) => {
   const prompt = "Provide a concise summary of the following text, highlighting the key concepts, main ideas, and keeping the summary clear and structured. Text: " + text.substring(0, 2000);
   
   try {
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash-lite",
-      contents: prompt,
-    });
-    const generatedText = response.text;
+    const model = ai.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const response = await model.generateContent(prompt);
+    const generatedText = response.response.text();
     return generatedText;
   } catch (error) {
     console.error('Gemini API error:', error);
@@ -170,11 +164,9 @@ Question: ${question}
 Answer:`;
 
   try {
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash-lite",
-      contents: prompt,
-    });
-    const generatedText = response.text;
+    const model = ai.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const response = await model.generateContent(prompt);
+    const generatedText = response.response.text();
     return generatedText;
   } catch (error) {
     console.error('Gemini API error:', error);
@@ -198,11 +190,9 @@ export const explainConcept = async (concept, context) => {
     const prompt = `Explain the concept of "${concept}" based on the following context. Provide a clear, educational explanation that's easy to understand. Include examples if relevant. Context: ${context.substring(0, 10000)}`;
 
     try {
-        const response = await ai.models.generateContent({
-            model: "gemini-2.5-flash-lite",
-            contents: prompt,
-        });
-        const generatedText = response.text;
+        const model = ai.getGenerativeModel({ model: "gemini-1.5-flash" });
+        const response = await model.generateContent(prompt);
+        const generatedText = response.response.text();
         return generatedText;
     } catch (error) {
         console.error('Gemini API error:', error);
