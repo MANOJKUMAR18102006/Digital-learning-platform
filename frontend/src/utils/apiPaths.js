@@ -41,3 +41,5 @@ export const API_PATHS = {
         GET_DASHBOARD: "/api/progress/dashboard",
     },
 };
+
+export default API_PATHS;

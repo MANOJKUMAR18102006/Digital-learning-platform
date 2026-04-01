@@ -6,7 +6,7 @@ import NotFoundPage from './pages/NotFoundPage';
 import DashboardPage from './pages/Dashboard/DashboardPage';
 import DocumentListPage from './pages/Documents/DocumentListPage';
 import DocumentDetailPage from './pages/Documents/DocumentDetailPage';
-import FlashcardPage from './pages/Flashcards/FlashCardPage';
+import FlashcardPage from './pages/Flashcards/FlashcardPage';
 import FlashcardsListPage from './pages/Flashcards/FlashcardsListPage';
 import QuizTakePage from './pages/Quizzes/QuizTakePage';
 import QuizResultPage from './pages/Quizzes/QuizResultPage';
