@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { Plus, Trash2, FileText, X } from "lucide-react";
+import { Plus, X, Trash2, FileText } from "lucide-react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import documentService from "../../services/documentService";
 import Spinner from "../../components/common/Spinner";
+import DocumentCard from "../../components/documents/DocumentCard";
 
 const DocumentListPage = () => {
     const [documents, setDocuments] = useState([]);
@@ -111,27 +112,13 @@ const DocumentListPage = () => {
         }
 
         return (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                {documents.map((doc) => (
-                    <div
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+                {documents?.map((doc) => (
+                    <DocumentCard
                         key={doc._id}
-                        onClick={() => navigate(`/documents/${doc._id}`)}
-                        className="group relative bg-white rounded-2xl border border-slate-200 p-5 shadow-sm hover:shadow-md hover:border-emerald-300 transition-all cursor-pointer"
-                    >
-                        <div className="flex items-start justify-between mb-3">
-                            <div className="flex items-center justify-center h-10 w-10 rounded-xl bg-emerald-50 text-emerald-500">
-                                <FileText className="h-5 w-5" strokeWidth={2} />
-                            </div>
-                            <button
-                                onClick={(e) => { e.stopPropagation(); handleDeleteRequest(doc); }}
-                                className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg text-slate-400 hover:bg-red-50 hover:text-red-500 transition-all"
-                            >
-                                <Trash2 className="h-4 w-4" strokeWidth={2} />
-                            </button>
-                        </div>
-                        <p className="text-sm font-semibold text-slate-900 truncate mb-1">{doc.title}</p>
-                        <p className="text-xs text-slate-400">{new Date(doc.createdAt).toLocaleDateString()}</p>
-                    </div>
+                        document={doc}
+                        onDelete={handleDeleteRequest}
+                    />
                 ))}
             </div>
         );
@@ -169,25 +156,44 @@ const DocumentListPage = () => {
                             </button>
                         </div>
                         <form onSubmit={handleUpload} className="space-y-4">
-                            <div>
-                                <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wide mb-1.5">Title</label>
+                            {/* Title Input */}
+                            <div className="space-y-1.5">
+                                <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wide">
+                                    Document Title
+                                </label>
                                 <input
                                     type="text"
                                     value={uploadTitle}
                                     onChange={(e) => setUploadTitle(e.target.value)}
-                                    className="w-full h-11 px-4 border-2 border-slate-200 rounded-xl text-sm focus:outline-none focus:border-emerald-500"
-                                    placeholder="Document title"
+                                    required
+                                    className="w-full h-11 px-4 border-2 border-slate-200 rounded-xl text-sm focus:outline-none focus:border-emerald-500 transition-colors"
+                                    placeholder="e.g., React Interview Prep"
                                 />
                             </div>
-                            <div>
-                                <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wide mb-1.5">File (PDF)</label>
-                                <input
-                                    type="file"
-                                    accept=".pdf"
-                                    onChange={handleFileChange}
-                                    className="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-emerald-50 file:text-emerald-600 hover:file:bg-emerald-100"
-                                />
+
+                            {/* File Upload */}
+                            <div className="space-y-1.5">
+                                <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wide">
+                                    PDF File
+                                </label>
+                                <div className="relative border-2 border-dashed border-slate-200 rounded-xl p-6 hover:border-emerald-400 transition-colors text-center">
+                                    <input
+                                        type="file"
+                                        accept=".pdf"
+                                        onChange={handleFileChange}
+                                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                    />
+                                    <p className="text-sm text-slate-500">
+                                        {uploadFile ? (
+                                            <span className="text-emerald-600 font-medium">{uploadFile.name}</span>
+                                        ) : (
+                                            <span className="text-emerald-500 font-medium">Click to upload</span>
+                                        )} or drag and drop
+                                    </p>
+                                    <p className="text-xs text-slate-400 mt-1">PDF files only</p>
+                                </div>
                             </div>
+
                             <button
                                 type="submit"
                                 disabled={uploading}
@@ -203,8 +209,21 @@ const DocumentListPage = () => {
             {/* Delete Confirmation Modal */}
             {isDeleteModalOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-                    <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6">
-                        <h2 className="text-lg font-semibold text-slate-900 mb-2">Delete Document</h2>
+                    <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-sm p-6">
+                        {/* Close button */}
+                        <button onClick={() => setIsDeleteModalOpen(false)} className="absolute top-4 right-4 p-1.5 rounded-lg text-slate-400 hover:bg-slate-100 transition-colors">
+                            <X className="h-5 w-5" strokeWidth={2} />
+                        </button>
+
+                        {/* Modal Header */}
+                        <div className="flex flex-col items-center text-center mb-4">
+                            <div className="flex items-center justify-center h-12 w-12 rounded-full bg-red-100 text-red-500 mb-3">
+                                <Trash2 className="h-6 w-6" strokeWidth={2} />
+                            </div>
+                            <h2 className="text-lg font-semibold text-slate-900">Confirm Deletion</h2>
+                        </div>
+
+                        {/* Content */}
                         <p className="text-sm text-slate-500 mb-6">
                             Are you sure you want to delete <span className="font-medium text-slate-900">"{selectedDoc?.title}"</span>? This action cannot be undone.
                         </p>
