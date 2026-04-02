@@ -34,11 +34,8 @@ const DocumentDetailPage = () => {
     const getPdfUrl = () => {
         if (!document?.data?.filePath) return null;
         const filePath = document.data.filePath;
-        if (filePath.startsWith('http://') || filePath.startsWith('https://')) {
-            return filePath;
-        }
-        const baseUrl = 'http://localhost:8000';
-        return `${baseUrl}${filePath.startsWith('/') ? '' : '/'}${filePath}`;
+        const fileName = filePath.replace(/\\/g, '/').split('/').pop();
+        return `http://localhost:8000/uploads/documents/${fileName}`;
     };
 
     const renderContent = () => {
