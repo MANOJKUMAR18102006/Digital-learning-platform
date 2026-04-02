@@ -56,7 +56,6 @@ export const getDashboard = async (req, res, next) => {
           reviewedFlashcards,
           starredFlashcards,
           totalQuizzes,
-          completedQuizzes,
           averageScore,
           studyStreak
         },
