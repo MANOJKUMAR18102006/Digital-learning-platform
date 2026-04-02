@@ -7,6 +7,7 @@ import { ArrowLeft, ExternalLink } from 'lucide-react';
 import PageHeader from '../../components/common/PageHeader';
 import Tabs from '../../components/common/Tabs';
 import ChatInterface from '../../components/documents/ChatInterface';
+import AIActions from 'components/ai/AIActions';
 
 const DocumentDetailPage = () => {
     const { id } = useParams();
@@ -78,23 +79,15 @@ const DocumentDetailPage = () => {
     };
 
     const renderChat = () => {
-        return <ChatInterface documentId={id} />;
+        return <ChatInterface />;
     };
 
     const renderAIActions = () => {
-        return (
-            <div className="flex items-center justify-center h-64 text-slate-400 text-sm">
-                AI Actions coming soon.
-            </div>
-        );
+        return <AIActions />;
     };
 
     const renderFlashcardsTab = () => {
-        return (
-            <div className="flex items-center justify-center h-64 text-slate-400 text-sm">
-                Flashcards coming soon.
-            </div>
-        );
+        return <FlashcardManager documentId={id} />;
     };
 
     const renderQuizzesTab = () => {

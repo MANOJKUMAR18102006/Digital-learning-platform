@@ -88,14 +88,14 @@ const ChatInterface = () => {
                         </div>
                     )}
                 </div>
-            </div>
-        )
            {isUser && (
                 <div className="">
                     {user7.username?.charAt(0).toUpperCase() || 'U'}
                 </div>
             )
         }
+        </div>
+        )
     };
 
     if (initialLoading) {
