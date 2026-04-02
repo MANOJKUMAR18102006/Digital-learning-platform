@@ -29,7 +29,7 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
             />
 
             <aside
-                className={`fixed top-0 left-0 h-full w-64 bg-white/90 backdrop-blur-lg border-r border-slate-200 z-50 flex flex-col transition-transform duration-300 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}
+                className={`fixed top-0 left-0 h-full w-64 bg-white/90 backdrop-blur-lg border-r border-slate-200 z-50 flex flex-col transition-transform duration-300 md:relative md:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}
             >
                 {/* Logo and Close button */}
                 <div className="flex items-center justify-between px-5 py-4 border-b border-slate-200">
