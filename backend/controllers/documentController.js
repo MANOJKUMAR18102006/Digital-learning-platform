@@ -41,9 +41,9 @@ export const uploadDocument = async (req, res, next) => {
 
     // Create document record
     const document = await Document.create({
-      user_id: req.user.id,
+      userId: req.user._id,
       title,
-      fileUrl: fileUrl,
+      fileName: req.file.originalname,
       filePath: req.file.path,
       fileSize: req.file.size,
       status: 'processing'
