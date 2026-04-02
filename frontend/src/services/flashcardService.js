@@ -1,4 +1,4 @@
-import axiosInstance from '../utils/axiosinstance';
+import axiosInstance from '../utils/axiosInstance';
 import { API_PATHS } from '../utils/apiPaths';
 
 const getAllFlashcardSets = async () => {
@@ -30,7 +30,7 @@ const reviewFlashcard = async (cardId, cardIndex) => {
 
 const toggleStar = async (cardId) => {
   try {
-    const response = await axiosInstance.put(API_PATHS.FLASHCARD.TOGGLE_STAR(cardId));
+    const response = await axiosInstance.put(API_PATHS.FLASHCARDS.TOGGLE_STAR(cardId));
     return response.data;
   } catch (error) {
     throw error.response?.data || { message: 'Failed to star flashcard' };

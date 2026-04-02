@@ -9,7 +9,6 @@ const generateToken = (id) =>
 
 export const register = async (req, res, next) => {
   const { username, email, password } = req.body;
-
   try {
     // Check if user exists
     const userExists = await User.findOne({ $or: [{ email }] });
