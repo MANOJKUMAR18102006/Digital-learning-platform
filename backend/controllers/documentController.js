@@ -9,6 +9,11 @@ import {
 } from '../utils/textChunker.js';
 import fs from 'fs/promises';
 import mongoose from 'mongoose';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // @desc      Upload PDF document
 // @route     POST /api/documents/upload
