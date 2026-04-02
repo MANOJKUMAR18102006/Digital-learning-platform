@@ -91,11 +91,7 @@ const DocumentDetailPage = () => {
     };
 
     const renderQuizzesTab = () => {
-        return (
-            <div className="flex items-center justify-center h-64 text-slate-400 text-sm">
-                Quizzes coming soon.
-            </div>
-        );
+        return <QuizManager documentId={id} />;
     };
 
     const tabs = [

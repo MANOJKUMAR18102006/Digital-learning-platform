@@ -11,6 +11,7 @@ import toast from "react-hot-toast";
 import flashcardService from "../../services/flashcardService";
 import aiService from "../../services/aiService";
 import Spinner from "../common/Spinner";
+import Flashcard from "./Flashcard";
 
 const FlashcardManager = ({ documentId }) => {
     const [flashcardSets, setFlashcardSets] = useState([]);
@@ -78,6 +79,26 @@ const FlashcardManager = ({ documentId }) => {
         }
     };
 
+    const handleToggleStar = async (cardId) => {
+        try {
+            await flashcardService.toggleStar(cardId);
+            const updatedSets = flashcardSets.map((set) => {
+                if (set._id === selectedSet._id) {
+                    const updatedCards = set.cards.map((card) => {
+                        card._id === cardId ? { ...card, isStarred: !card.isStarred } : card;
+                    });
+                    return { ...set, cards: updatedCards };
+                }
+                return set;
+            });
+            setFlashcardSets(updatedSets);
+            setSelectedSet(updatedSets.find((set) => set._id === selectedSet._id));
+            toast.success("Flashcard starred status updated!");
+        } catch (error) {
+            toast.error("Failed to update star status.");
+        }
+    };
+
     const handleDeleteRequest = (e, set) => {
         e.stopPropagation();
         setSetToDelete(set);
@@ -98,6 +119,21 @@ const FlashcardManager = ({ documentId }) => {
             toast.error(error.message || "Failed to delete flashcard set.");
         } finally {
             setDeleting(false);
+        }
+    };
+
+    const handleToggleStar = async (card) => {
+        if (!card) return;
+        try {
+            await flashcardService.toggleStar(card._id);
+            setSelectedSet((prev) => ({
+                ...prev,
+                cards: prev.cards.map((c) =>
+                    c._id === card._id ? { ...c, isStarred: !c.isStarred } : c
+                ),
+            }));
+        } catch (error) {
+            toast.error('Failed to toggle star.');
         }
     };
 
@@ -127,12 +163,14 @@ const FlashcardManager = ({ documentId }) => {
                     <span className="text-sm text-slate-400">{currentCardIndex + 1} / {selectedSet.cards.length}</span>
                 </div>
 
-                {/* Flashcard */}
-                <div className="bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-100 rounded-2xl p-8 min-h-[200px] flex flex-col items-center justify-center text-center shadow-sm">
-                    <p className="text-slate-800 text-base font-medium leading-relaxed">{currentCard?.front}</p>
-                    {currentCard?.back && (
-                        <p className="text-slate-500 text-sm mt-4 pt-4 border-t border-emerald-100 w-full">{currentCard.back}</p>
-                    )}
+                {/* Flashcard Display */}
+                <div className="flex flex-col items-center space-y-8">
+                    <div className="w-full max-w-2xl">
+                        <Flashcard
+                            flashcard={currentCard}
+                            onToggleStar={handleToggleStar}
+                        />
+                    </div>
                 </div>
 
                 {/* Navigation */}
