@@ -1,12 +1,6 @@
-import React, { useState, useEffect, use } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
-import {
-  ArrowLeft,
-  Plus,
-  ChevronRight,
-  ChevronLeft,
-  Trash2,
-} from "lucide-react";
+import { ChevronRight, ChevronLeft, ArrowLeft, Trash2, Plus } from "lucide-react";
 import toast from "react-hot-toast";
 
 import flashcardService from "../../services/flashcardService";
@@ -63,7 +57,140 @@ const FlashcardPage = () => {
     setCurrentCardIndex((prevIndex) => (prevIndex + 1) % flashcards.length);
   };
 
-  return <div>FlashcardPage</div>;
-}
+  const handlePrevCard = () => {
+    handleReview(currentCardIndex);
+    setCurrentCardIndex(
+      (prevIndex) => (prevIndex - 1 + flashcards.length) % flashcards.length
+    );
+  };
+
+  const handleReview = async (index) => {
+    const currentCard = flashcards[index];
+    if (!currentCard) return;
+    try {
+      await flashcardService.reviewFlashcard(currentCard._id, index);
+    } catch (error) {
+      toast.error("Failed to review flashcard.");
+    }
+  };
+
+  const handleToggleStar = async (cardId) => {
+    try {
+      await flashcardService.toggleStar(cardId);
+      setFlashcards((prevFlashcards) =>
+        prevFlashcards.map((card) =>
+          card._id === cardId ? { ...card, isStarred: !card.isStarred } : card
+        )
+      );
+    } catch (error) {
+      toast.error("Failed to update star status.");
+    }
+  };
+
+  const handleDeleteFlashcardSet = async () => {
+    setDeleting(true);
+    try {
+      await flashcardService.deleteFlashcardSet(flashcardSets._id);
+      toast.success("Flashcard set deleted successfully!");
+      setIsDeleteModalOpen(false);
+      fetchFlashcards();
+    } catch (error) {
+      toast.error(error.message || "Failed to delete flashcard set.");
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  const currentCard = flashcards[currentCardIndex];
+
+  if (loading) return <Spinner />;
+
+  if (flashcards.length === 0) {
+    return (
+      <EmptyState
+        title="No Flashcards Yet"
+        description="Generate flashcards from your document to start learning."
+      />
+    );
+  }
+
+  return (
+    <>
+      <PageHeader title="Flashcards">
+        <div className="">
+          {!loading &&
+            (flashcards.length > 0 ? (
+              <Button onClick={() => setIsDeleteModalOpen(true)} disabled={deleting}>
+                <Trash2 size={16} /> Delete Set
+              </Button>
+            ) : (
+              <Button onClick={handleGenerateFlashcards} disabled={generating}>
+                {generating ? (
+                  <Spinner />
+                ) : (
+                  <><Plus size={16} /> Generate Flashcards</>
+                )}
+              </Button>
+            ))}
+        </div>
+      </PageHeader>
+      <div className="">
+        <div className="">
+          <Flashcard flashcard={currentCard} onToggleStar={handleToggleStar} />
+        </div>
+        <div className="">
+          <Button
+            onClick={handlePrevCard}
+            variant="secondary"
+            disabled={flashcards.length <= 1}
+          >
+            <ChevronLeft size={16} /> Previous
+          </Button>
+          <span className="">
+            {currentCardIndex + 1} / {flashcards.length}
+          </span>
+          <Button
+            onClick={handleNextCard}
+            variant="secondary"
+            disabled={flashcards.length <= 1}
+          >
+            Next <ChevronRight size={16} />
+          </Button>
+        </div>
+      </div>
+
+      {renderFlashcardcontent()}
+      <Modal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        title="Confirm Delete Flashcard Set"
+      >
+        <div className="">
+          <p className="">
+            Are you sure you want to delete all flashcards for this document?
+            This action cannot be undone.
+          </p>
+          <div className="">
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => setIsDeleteModalOpen(false)}
+              disabled={deleting}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleDeleteFlashcardSet}
+              disabled={deleting}
+              className=""
+            >
+              {deleting ? "Deleting..." : "Delete"}
+            </Button>
+          </div>
+        </div>
+      </Modal>
+    </>
+  );
+};
 
 export default FlashcardPage;
