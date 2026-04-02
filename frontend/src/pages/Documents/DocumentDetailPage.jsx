@@ -7,6 +7,7 @@ import { ArrowLeft, ExternalLink } from 'lucide-react';
 import PageHeader from '../../components/common/PageHeader';
 import Tabs from '../../components/common/Tabs';
 import ChatInterface from '../../components/documents/ChatInterface';
+import AIActions from '../../components/documents/AIActions';
 import FlashcardManager from '../../components/flashcards/FlashcardManager';
 import QuizManager from '../../components/quizzes/QuizManager';
 
@@ -34,6 +35,9 @@ const DocumentDetailPage = () => {
     const getPdfUrl = () => {
         if (!document?.data?.filePath) return null;
         const filePath = document.data.filePath;
+        if (filePath.startsWith('http')) return filePath;
+        if (filePath.startsWith('/uploads')) return `http://localhost:8000${filePath}`;
+        // fallback for old absolute Windows paths
         const fileName = filePath.replace(/\\/g, '/').split('/').pop();
         return `http://localhost:8000/uploads/documents/${fileName}`;
     };
@@ -81,11 +85,7 @@ const DocumentDetailPage = () => {
     };
 
     const renderAIActions = () => {
-        return (
-            <div className="flex items-center justify-center h-64 text-slate-400 text-sm">
-                AI Actions coming soon.
-            </div>
-        );
+        return <AIActions documentId={id} />;
     };
 
     const renderFlashcardsTab = () => {

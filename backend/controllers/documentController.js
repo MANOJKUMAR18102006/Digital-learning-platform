@@ -44,12 +44,11 @@ export const uploadDocument = async (req, res, next) => {
       userId: req.user._id,
       title,
       fileName: req.file.originalname,
-      filePath: req.file.path,
+      filePath: `/uploads/documents/${req.file.filename}`,
       fileSize: req.file.size,
       status: 'processing'
     });
 
-    // Process PDF in background (in production, use a queue like Bull)
     processPDF(document._id, req.file.path).catch(err => {
       console.error('PDF processing error:', err);
     });
@@ -198,7 +197,8 @@ export const deleteDocument = async (req, res, next) => {
     }
 
     // Delete file from filesystem
-    await fs.unlink(document.filePath).catch(() => {});
+    const absolutePath = path.join(__dirname, '..', document.filePath);
+    await fs.unlink(absolutePath).catch(() => {});
 
     // Delete document
     await document.deleteOne();

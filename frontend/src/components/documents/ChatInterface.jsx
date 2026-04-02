@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, Sparkles, User } from 'lucide-react';
+import aiService from '../../services/aiService';
+import toast from 'react-hot-toast';
 
 const ChatInterface = ({ documentId }) => {
     const [message, setMessage] = useState('');
@@ -21,10 +23,12 @@ const ChatInterface = ({ documentId }) => {
         setLoading(true);
 
         try {
-            const aiMessage = { role: 'assistant', content: 'AI response coming soon.' };
+            const response = await aiService.chat(documentId, message);
+            const aiMessage = { role: 'assistant', content: response.data?.answer || 'No response received.' };
             setMessages((prev) => [...prev, aiMessage]);
         } catch (error) {
-            console.error(error);
+            toast.error('Failed to get response.');
+            setMessages((prev) => [...prev, { role: 'assistant', content: 'Sorry, I could not process your request.' }]);
         } finally {
             setLoading(false);
         }
