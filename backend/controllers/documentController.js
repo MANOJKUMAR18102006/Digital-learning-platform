@@ -72,6 +72,22 @@ export const uploadDocument = async (req, res, next) => {
   }
 };
 
+export const reprocessDocument = async (req, res, next) => {
+  try {
+    const document = await Document.findOne({ _id: req.params.id, userId: req.user._id });
+    if (!document) return res.status(404).json({ success: false, error: 'Document not found' });
+
+    await Document.findByIdAndUpdate(document._id, { status: 'processing' });
+
+    const absolutePath = path.join(__dirname, '..', document.filePath);
+    processPDF(document._id, absolutePath).catch(err => console.error('Reprocess error:', err));
+
+    res.status(200).json({ success: true, message: 'Reprocessing started' });
+  } catch (error) {
+    next(error);
+  }
+};
+
 const processPDF = async (documentId, filePath) => {
   try {
     const { text } = await extractTextFromPDF(filePath);

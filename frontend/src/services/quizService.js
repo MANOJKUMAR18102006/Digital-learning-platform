@@ -31,7 +31,7 @@ const submitQuiz = async (quizId, answers) => {
 const getQuizResults = async (quizId) => {
     try {
         const response = await axiosInstance.get(API_PATHS.QUIZZES.GET_QUIZ_RESULTS(quizId));
-        return response.data;
+        return response.data.data;
     } catch (error) {
         throw error.response?.data || { message: 'Failed to fetch quiz results' };
     }

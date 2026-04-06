@@ -25,6 +25,11 @@ export const AuthProvider = ({ children }) => {
             const userStr = localStorage.getItem('user');
 
             if (token && userStr) {
+                const payload = JSON.parse(atob(token.split('.')[1]));
+                if (payload.exp * 1000 < Date.now()) {
+                    logout();
+                    return;
+                }
                 const userData = JSON.parse(userStr);
                 setUser(userData);
                 setIsAuthenticated(true);

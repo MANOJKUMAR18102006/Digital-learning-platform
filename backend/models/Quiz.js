@@ -53,6 +53,10 @@ const quizSchema = new mongoose.Schema(
                     type: String,
                     required: true,
                 },
+                isCorrect: {
+                    type: Boolean,
+                    default: false,
+                },
                 answeredAt: {
                     type: Date,
                     default: Date.now,

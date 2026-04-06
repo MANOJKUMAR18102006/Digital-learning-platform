@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import aiService from '../../../services/aiService';
-import useAuth from '../context/AuthContext';
+import { useAuth } from '../../context/AuthContext';
 import Spinner from '../common/Spinner';
 import MarkdownRenderer from '../common/MarkdownRenderer';
 
 const ChatInterface = () => {
     const { id: documentId } = useParams();
-    const user = useAuth();
+    const { user } = useAuth();
     const [history, setHistory] = useState([]);
     const [message, setMessage] = useState('');
     const [loading, setLoading] = useState(false);
@@ -15,7 +15,7 @@ const ChatInterface = () => {
     const messagesEndRef = useRef(null);
 
     const scrollToBottom = () => {
-        messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     };
 
 
@@ -90,7 +90,7 @@ const ChatInterface = () => {
                 </div>
            {isUser && (
                 <div className="">
-                    {user7.username?.charAt(0).toUpperCase() || 'U'}
+                    {user?.username?.charAt(0).toUpperCase() || 'U'}
                 </div>
             )
         }

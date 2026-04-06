@@ -44,7 +44,7 @@ const Flashcard = ({ flashcard, onToggleStar }) => {
                         {/* Question Content */}
                         <div className="flex-1 flex items-center justify-center px-4">
                             <p className="text-slate-800 text-base font-medium text-center leading-relaxed">
-                                {flashcard?.front}
+                                {flashcard?.question || flashcard?.front}
                             </p>
                         </div>
                         {/* Flip Indicator */}
@@ -77,7 +77,7 @@ const Flashcard = ({ flashcard, onToggleStar }) => {
                         <span className="text-xs font-semibold text-teal-400 uppercase tracking-widest mb-4">Answer</span>
                         <div className="flex-1 flex items-center justify-center px-4 py-6">
                             <p className="text-base text-white text-center leading-relaxed font-medium">
-                                {flashcard?.back}
+                                {flashcard?.answer || flashcard?.back}
                             </p>
                         </div>
                         {/* Flip Indicator */}

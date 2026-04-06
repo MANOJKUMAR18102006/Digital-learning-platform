@@ -21,7 +21,7 @@ export const API_PATHS = {
         GENERATE_SUMMARY: "/api/ai/generate-summary",
         CHAT: "/api/ai/chat",
         EXPLAIN_CONCEPT: "/api/ai/explain-concept",
-        GET_CHAT_HISTORY: (documentId) => `/api/chat-history/${documentId}`,
+        GET_CHAT_HISTORY: (documentId) => `/api/ai/chat-history/${documentId}`,
     },
     FLASHCARDS: {
         GET_ALL_FLASHCARD_SETS: "/api/flashcards",

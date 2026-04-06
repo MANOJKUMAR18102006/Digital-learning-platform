@@ -33,7 +33,7 @@ const QuizResultPage = () => {
     );
   }
 
-  if (!results || !results.data) {
+  if (!results) {
     return (
       <div className="flex items-center justify-center h-screen">
         <p className="text-slate-500 text-sm">Quiz results not found.</p>
@@ -41,11 +41,11 @@ const QuizResultPage = () => {
     );
   }
 
-  const { data: { quiz, results: detailedResults } } = results;
+  const { quiz, results: detailedResults, totalQuestions } = results;
   const score = quiz.score;
-  const totalQuestions = detailedResults.length;
   const correctAnswers = detailedResults.filter(r => r.isCorrect).length;
   const incorrectAnswers = totalQuestions - correctAnswers;
+  const documentId = quiz.document?._id || quiz.document;
 
   const getScoreColor = (score) => {
     if (score >= 80) return 'from-emerald-500 to-teal-500';
@@ -66,7 +66,7 @@ const QuizResultPage = () => {
       {/* Back Button */}
       <div className="mb-4">
         <Link
-          to={`/documents/${quiz.documentId}`}
+          to={`/documents/${documentId}`}
           className="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-slate-800 transition-colors"
         >
           <ArrowLeft className="h-4 w-4" strokeWidth={2} />
@@ -168,7 +168,7 @@ const QuizResultPage = () => {
 
       {/* Action Button */}
       <div className="mt-8 flex justify-center">
-        <Link to={`/documents/${quiz.documentId}`}>
+        <Link to={`/documents/${documentId}`}>
           <button className="group relative px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white text-sm font-medium rounded-xl transition-all shadow-md shadow-emerald-500/25">
             <span className="flex items-center gap-2">
               <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" strokeWidth={2.5} />
