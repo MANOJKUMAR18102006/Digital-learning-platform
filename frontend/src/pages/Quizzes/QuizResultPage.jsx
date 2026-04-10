@@ -1,15 +1,38 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import quizService from '../../services/quizService';
+import aiService from '../../services/aiService';
 import PageHeader from '../../components/common/PageHeader';
 import Spinner from '../../components/common/Spinner';
+import MarkdownRenderer from '../../components/common/MarkdownRenderer';
 import toast from 'react-hot-toast';
-import { ArrowLeft, CheckCircle2, XCircle, Trophy, Target, BookOpen } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, XCircle, Trophy, Target, BookOpen, Sparkles, Brain } from 'lucide-react';
 
 const QuizResultPage = () => {
   const { quizId } = useParams();
   const [results, setResults] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [analyzing, setAnalyzing] = useState(false);
+  const [analysis, setAnalysis] = useState(null);
+
+  const handleAnalyzeQuiz = async () => {
+    setAnalyzing(true);
+    try {
+      const quizData = detailedResults.map(r => ({
+        question: r.question,
+        selectedAnswer: r.selectedAnswer,
+        correctAnswer: r.correctAnswer,
+        isCorrect: r.isCorrect
+      }));
+      const response = await aiService.analyzeQuiz(quizData);
+      setAnalysis(response.data);
+      toast.success('Analysis complete!');
+    } catch (error) {
+      toast.error('Failed to analyze quiz');
+    } finally {
+      setAnalyzing(false);
+    }
+  };
 
   useEffect(() => {
     const fetchResults = async () => {
@@ -104,6 +127,53 @@ const QuizResultPage = () => {
           <p className="text-xs text-slate-400 mt-0.5">Incorrect</p>
         </div>
       </div>
+
+      {/* AI Analysis Section */}
+      {!analysis ? (
+        <div className="mb-8">
+          <button
+            onClick={handleAnalyzeQuiz}
+            disabled={analyzing}
+            className="w-full group relative flex items-center justify-center gap-3 py-4 bg-white border-2 border-slate-200 border-dashed rounded-2xl hover:border-emerald-500 hover:bg-emerald-50 transition-all duration-300 disabled:opacity-50"
+          >
+            {analyzing ? (
+              <>
+                <Spinner className="w-5 h-5" />
+                <span className="text-sm font-bold text-slate-600">AI is analyzing your struggles...</span>
+              </>
+            ) : (
+              <>
+                <Sparkles className="w-5 h-5 text-emerald-500 group-hover:rotate-12 transition-transform" />
+                <span className="text-sm font-bold text-slate-700">Analyze My Struggles with AI</span>
+              </>
+            )}
+          </button>
+        </div>
+      ) : (
+        <div className="mb-8 bg-emerald-50/50 border border-emerald-100 rounded-3xl p-8 animate-in fade-in slide-in-from-bottom-4 duration-500 shadow-sm">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="h-10 w-10 bg-emerald-100 rounded-xl flex items-center justify-center text-emerald-600">
+              <Brain className="w-6 h-6" />
+            </div>
+            <div>
+              <h3 className="text-lg font-black text-slate-900 leading-none">Personalized Struggle Analysis</h3>
+              <p className="text-xs text-emerald-600 font-bold uppercase tracking-widest mt-1 italic">Knowledge Gap Report</p>
+            </div>
+          </div>
+          <div className="bg-white rounded-2xl p-6 border border-emerald-100/50 shadow-inner">
+            <MarkdownRenderer content={analysis} />
+          </div>
+          
+          <div className="mt-8 pt-6 border-t border-emerald-100 flex items-center justify-between">
+             <p className="text-xs text-slate-500 font-medium">Ready to fix these gaps?</p>
+             <Link to={`/documents/${documentId}`}>
+                <button className="flex items-center gap-2 px-6 py-3 bg-emerald-600 text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-600/20 active:scale-95">
+                  <BookOpen className="w-3.5 h-3.5" /> Study Weak Topics
+                </button>
+             </Link>
+          </div>
+        </div>
+      )}
 
       {/* Questions Review */}
       <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">

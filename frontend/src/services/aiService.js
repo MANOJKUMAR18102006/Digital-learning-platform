@@ -46,12 +46,30 @@ const explainConcept = async (documentId, concept) => {
     }
 };
 
+const generateStudyPlan = async (studyDetails) => {
+    try {
+        const response = await axiosInstance.post(API_PATHS.AI.GENERATE_STUDY_PLAN, studyDetails);
+        return response.data;
+    } catch (error) {
+        throw error.response?.data || { message: 'Failed to generate study plan' };
+    }
+};
+
 const getChatHistory = async (documentId) => {
     try {
         const response = await axiosInstance.get(API_PATHS.AI.GET_CHAT_HISTORY(documentId));
         return response.data;
     } catch (error) {
         throw error.response?.data || { message: 'Failed to fetch chat history' };
+    }
+};
+
+const analyzeQuiz = async (quizData) => {
+    try {
+        const response = await axiosInstance.post(API_PATHS.AI.ANALYZE_QUIZ, { quizData });
+        return response.data;
+    } catch (error) {
+        throw error.response?.data || { message: 'Failed to analyze quiz' };
     }
 };
 
@@ -62,6 +80,8 @@ const aiService = {
     chat,
     explainConcept,
     getChatHistory,
+    generateStudyPlan,
+    analyzeQuiz,
 };
 
 export default aiService;

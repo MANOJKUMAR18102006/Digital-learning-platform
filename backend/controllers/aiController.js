@@ -310,3 +310,57 @@ export const getChatHistory = async (req, res, next) => {
         next(error);
     }
 };
+
+// ================= STUDY PLAN =================
+export const generateStudyPlan = async (req, res, next) => {
+    try {
+        const { documentId, hours, weakTopics, strongTopics, examDate, performanceData, nDays } = req.body;
+
+        let documentText = '';
+        if (documentId) {
+            const document = await Document.findOne({ _id: documentId, userId: req.user._id });
+            if (document) {
+                documentText = normalizeText(document.extractedText);
+            }
+        }
+
+        const studyPlan = await geminiService.generateStudyPlan({
+            hours,
+            weakTopics,
+            strongTopics,
+            examDate,
+            performanceData,
+            nDays,
+            documentText // Pass the actual PDF content
+        });
+
+        res.status(200).json({
+            success: true,
+            data: studyPlan,
+            message: 'Study plan generated successfully'
+        });
+
+    } catch (error) {
+        console.error("❌ Study Plan Error:", error);
+        next(error);
+    }
+};
+
+// ================= QUIZ ANALYSIS =================
+export const analyzeQuiz = async (req, res, next) => {
+    try {
+        const { quizData } = req.body;
+
+        const analysis = await geminiService.analyzeQuizResults(quizData);
+
+        res.status(200).json({
+            success: true,
+            data: analysis,
+            message: 'Quiz analysis generated successfully'
+        });
+
+    } catch (error) {
+        console.error("❌ Quiz Analysis Error:", error);
+        next(error);
+    }
+};

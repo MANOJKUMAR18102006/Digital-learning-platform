@@ -8,6 +8,7 @@ import DocumentListPage from './pages/Documents/DocumentListPage';
 import DocumentDetailPage from './pages/Documents/DocumentDetailPage';
 import FlashcardPage from './pages/Flashcards/FlashcardPage';
 import FlashcardsListPage from './pages/Flashcards/FlashcardsListPage';
+import StudyPlanPage from './pages/StudyPlan/StudyPlanPage';
 import QuizTakePage from './pages/Quizzes/QuizTakePage';
 import QuizResultPage from './pages/Quizzes/QuizResultPage';
 import ProfilePage from './pages/Profile/ProfilePage';
@@ -38,6 +39,7 @@ const App = () => {
           <Route path="/documents" element={<DocumentListPage />} />
           <Route path="/documents/:id" element={<DocumentDetailPage />} />
           <Route path="/flashcards" element={<FlashcardsListPage />} />
+          <Route path="/study-plan" element={<StudyPlanPage />} />
           <Route path="/documents/:id/flashcards" element={<FlashcardPage />} />
           <Route path="/quizzes/:quizId" element={<QuizTakePage />} />
           <Route path="/quizzes/:quizId/results" element={<QuizResultPage />} />

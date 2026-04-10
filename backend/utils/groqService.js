@@ -168,3 +168,69 @@ ${context.substring(0, 10000)}`;
         throw new Error('Failed to explain concept');
     }
 };
+export const generateStudyPlan = async (details) => {
+    try {
+        const { hours, weakTopics, strongTopics, examDate, performanceData, nDays = 7, documentText } = details;
+        
+        let prompt = `You are an AI tutor. Create a personalized study plan for a student based on the following details:
+- Available study time per day: ${hours} hours
+- Weak topics: ${weakTopics}
+- Strong topics: ${strongTopics}
+- Upcoming exam date: ${examDate}
+- Past quiz performance: ${performanceData}
+`;
+
+        if (documentText) {
+            prompt += `
+- BASE DOCUMENT CONTENT:
+The student is studying from a specific document. Here is the relevant content from it:
+---
+${documentText.substring(0, 3000)}
+---
+Please ensure the study plan specifically references and covers the material found in the text above.
+`;
+        }
+
+        prompt += `
+ Instructions:
+- Create a detailed daily study schedule for the next ${nDays} days.
+- Prioritize weak topics more heavily (approx 70% of time).
+- Include specific revision sessions (approx 15%) and practice sessions (approx 15%).
+- Keep sessions realistic, balanced, and include breaks.
+- Format the output in high-quality Markdown.
+- Use H2 for Days (e.g., ## Day 1: Foundation).
+- Use bold text for time slots and topics.
+- Use bullet points for specific sub-tasks.
+- Add a concluding section with "AI Tutor Tips" for success.
+
+Personalized Study Plan:`;
+
+        return await generate(prompt);
+    } catch (error) {
+        console.error('Groq generateStudyPlan error:', error);
+        throw new Error('Failed to generate study plan');
+    }
+};
+
+export const analyzeQuizResults = async (quizData) => {
+    try {
+        const prompt = `Analyze the following quiz results and identify weak areas for the student.
+
+Quiz Data (Question, User Answer, Correct Answer, Result):
+${JSON.stringify(quizData, null, 2)}
+
+Instructions:
+- Identify topics where the user frequently makes mistakes.
+- Rank these weak topics from highest to lowest priority for study.
+- Suggest specific improvement actions for each (e.g., specific revision, practice, flashcards).
+- Provide the analysis in high-quality Markdown.
+- End with a summary call to action.
+
+Quiz Performance Analysis:`;
+
+        return await generate(prompt);
+    } catch (error) {
+        console.error('Groq analyzeQuizResults error:', error);
+        throw new Error('Failed to analyze quiz results');
+    }
+};

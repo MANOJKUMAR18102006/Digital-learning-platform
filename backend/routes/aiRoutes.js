@@ -6,6 +6,8 @@ import {
   chat,
   explainConcept,
   getChatHistory,
+  generateStudyPlan,
+  analyzeQuiz,
 } from '../controllers/aiController.js';
 import protect from '../middleware/auth.js';
 
@@ -20,6 +22,8 @@ router.post('/generate-quiz', generateQuiz);
 router.post('/generate-summary', generateSummary);
 router.post('/chat', chat);
 router.post('/explain-concept', explainConcept);
+router.post('/generate-study-plan', generateStudyPlan);
+router.post('/analyze-quiz', analyzeQuiz);
 router.get('/chat-history/:documentId', getChatHistory);
 
 export default router;
