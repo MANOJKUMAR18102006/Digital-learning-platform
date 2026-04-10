@@ -95,7 +95,13 @@ export const submitQuiz = async (req, res, next) => {
 
             if (!question) return;
 
-            const isCorrect = selectedAnswer === question.correctAnswer;
+            const normalize = (str) => str.toLowerCase().replace(/[^a-z0-9]/g, '').trim();
+            const normalizedSelected = normalize(selectedAnswer);
+            const normalizedCorrect = normalize(question.correctAnswer);
+
+            const isCorrect = normalizedSelected === normalizedCorrect || 
+                             normalizedSelected.includes(normalizedCorrect) || 
+                             normalizedCorrect.includes(normalizedSelected);
 
             if (isCorrect) correctCount++;
 

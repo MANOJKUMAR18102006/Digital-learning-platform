@@ -113,53 +113,97 @@ const QuizResultPage = () => {
         </div>
         <div className="divide-y divide-slate-100">
           {detailedResults.map((result, index) => {
-            const userAnswerIndex = result.options.findIndex(opt => opt === result.selected);
-            const correctAnswerIndex = result.correctAnswer.startsWith('0')
-              ? parseInt(result.correctAnswer.substring(1)) - 1
-              : result.options.findIndex(opt => opt === result.correctAnswer);
+            const normalize = (str) => str?.toLowerCase().replace(/[^a-z0-9]/g, '').trim() || '';
+            const normalizedOptions = result.options.map(opt => normalize(opt));
+            const normalizedUser = normalize(result.selectedAnswer);
+            const normalizedCorrect = normalize(result.correctAnswer);
+
+            const userAnswerIndex = normalizedOptions.findIndex(opt => opt === normalizedUser);
+            const correctAnswerIndex = normalizedOptions.findIndex(opt => opt === normalizedCorrect);
             const isCorrect = result.isCorrect;
 
             return (
-              <div key={index} className="px-5 py-4">
-                <div className="flex items-start gap-3 mb-3">
-                  {isCorrect ? (
-                    <CheckCircle2 className="h-5 w-5 text-emerald-500 flex-shrink-0 mt-0.5" strokeWidth={2} />
-                  ) : (
-                    <XCircle className="h-5 w-5 text-red-400 flex-shrink-0 mt-0.5" strokeWidth={2} />
-                  )}
-                  <p className="text-sm font-medium text-slate-800">
-                    {index + 1}. {result.question}
-                  </p>
+              <div key={index} className="px-5 py-6">
+                <div className="flex items-start gap-3 mb-4">
+                  <div className={`mt-0.5 flex-shrink-0 h-6 w-6 rounded-full flex items-center justify-center ${isCorrect ? 'bg-emerald-100 text-emerald-600' : 'bg-red-100 text-red-500'}`}>
+                    {isCorrect ? (
+                      <CheckCircle2 className="h-4 w-4" strokeWidth={2.5} />
+                    ) : (
+                      <XCircle className="h-4 w-4" strokeWidth={2.5} />
+                    )}
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-sm font-semibold text-slate-800 leading-relaxed">
+                      {index + 1}. {result.question}
+                    </p>
+                    {!isCorrect && (
+                      <p className="text-xs font-medium text-red-500">
+                        Incorrect Answer
+                      </p>
+                    )}
+                  </div>
                 </div>
-                <div className="ml-8 space-y-1.5">
-                  {result.options.map((option, optIndex) => (
-                    <div
-                      key={optIndex}
-                      className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium ${optIndex === correctAnswerIndex
-                          ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                          : optIndex === userAnswerIndex && !isCorrect
-                            ? 'bg-red-50 text-red-600 border border-red-200'
-                            : 'bg-slate-50 text-slate-500 border border-transparent'
+
+                <div className="ml-9 space-y-2 mb-4">
+                  {result.options.map((option, optIndex) => {
+                    const isUserChoice = optIndex === userAnswerIndex;
+                    const isRightAnswer = optIndex === correctAnswerIndex;
+                    
+                    return (
+                      <div
+                        key={optIndex}
+                        className={`flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-medium transition-all border ${
+                          isRightAnswer
+                            ? 'bg-emerald-50 text-emerald-700 border-emerald-200 ring-1 ring-emerald-100'
+                            : isUserChoice && !isCorrect
+                              ? 'bg-red-50 text-red-600 border-red-200'
+                              : 'bg-slate-50 text-slate-500 border-transparent'
                         }`}
-                    >
-                      <span className={`flex items-center justify-center h-5 w-5 rounded-full text-xs font-bold flex-shrink-0 ${optIndex === correctAnswerIndex
-                          ? 'bg-emerald-500 text-white'
-                          : optIndex === userAnswerIndex && !isCorrect
-                            ? 'bg-red-400 text-white'
-                            : 'bg-slate-200 text-slate-500'
+                      >
+                        <span className={`flex items-center justify-center h-6 w-6 rounded-lg text-[10px] font-bold flex-shrink-0 ${
+                          isRightAnswer
+                            ? 'bg-emerald-500 text-white'
+                            : isUserChoice && !isCorrect
+                              ? 'bg-red-500 text-white'
+                              : 'bg-slate-200 text-slate-500'
                         }`}>
-                        {String.fromCharCode(65 + optIndex)}
-                      </span>
-                      {option}
-                      {optIndex === correctAnswerIndex && (
-                        <CheckCircle2 className="ml-auto h-3.5 w-3.5 text-emerald-500" strokeWidth={2.5} />
-                      )}
-                      {optIndex === userAnswerIndex && !isCorrect && (
-                        <XCircle className="ml-auto h-3.5 w-3.5 text-red-400" strokeWidth={2.5} />
-                      )}
-                    </div>
-                  ))}
+                          {String.fromCharCode(65 + optIndex)}
+                        </span>
+                        <span className="flex-1">{option}</span>
+                        {isRightAnswer && (
+                          <div className="flex items-center gap-1 text-emerald-600 font-bold uppercase tracking-wider text-[9px]">
+                            <CheckCircle2 className="h-3.5 w-3.5" strokeWidth={3} />
+                            Correct
+                          </div>
+                        )}
+                        {isUserChoice && !isCorrect && (
+                          <div className="flex items-center gap-1 text-red-500 font-bold uppercase tracking-wider text-[9px]">
+                            <XCircle className="h-3.5 w-3.5" strokeWidth={3} />
+                            Your Choice
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
+
+                {/* Explanation Box */}
+                {(result.explanation || !isCorrect) && (
+                  <div className="ml-9 p-4 bg-slate-50 border border-slate-100 rounded-xl">
+                    <div className="flex items-center gap-2 mb-2">
+                       <div className="h-1.5 w-1.5 rounded-full bg-emerald-500"></div>
+                       <h4 className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">Correct Answer & Explanation</h4>
+                    </div>
+                    <p className="text-xs text-slate-800 mb-2">
+                      The correct answer is <span className="font-bold text-emerald-600">"{result.correctAnswer}"</span>.
+                    </p>
+                    {result.explanation && (
+                      <p className="text-xs text-slate-500 leading-relaxed italic">
+                        {result.explanation}
+                      </p>
+                    )}
+                  </div>
+                )}
               </div>
             );
           })}

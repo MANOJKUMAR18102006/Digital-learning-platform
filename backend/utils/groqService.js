@@ -72,20 +72,54 @@ ${text.substring(0, 2000)}`;
 
         for (const block of questionBlocks) {
             const lines = block.trim().split('\n');
-            let question = '', options = [], correctAnswer = '', explanation = '', difficulty = 'medium';
+            let question = '', options = [], correctAnswerLabel = '', correctAnswerText = '', explanation = '', difficulty = 'medium';
+            
             for (const line of lines) {
                 const trimmed = line.trim();
-                if (trimmed.startsWith('Q:')) question = trimmed.substring(2).trim();
-                else if (trimmed.match(/^O\d:/)) options.push(trimmed.substring(3).trim());
-                else if (trimmed.startsWith('C:')) correctAnswer = trimmed.substring(2).trim();
-                else if (trimmed.startsWith('E:')) explanation = trimmed.substring(2).trim();
-                else if (trimmed.startsWith('D:')) {
+                if (!trimmed) continue;
+
+                if (trimmed.startsWith('Q:')) {
+                    question = trimmed.substring(2).trim();
+                } else if (trimmed.match(/^(?:O\d+|[1-4]\.|[A-D]\))[:\.\)]/i)) {
+                    // Match O1:, 1., A) etc.
+                    const optionText = trimmed.replace(/^(?:O\d+|[1-4]\.|[A-D]\))[:\.\)]\s*/i, '').trim();
+                    if (options.length < 4) options.push(optionText);
+                } else if (trimmed.startsWith('C:')) {
+                    correctAnswerText = trimmed.substring(2).trim();
+                    // Check if it's a label like O1, 1, A
+                    const labelMatch = correctAnswerText.match(/^(?:O(\d)|(\d)|([A-D]))$/i);
+                    if (labelMatch) {
+                        const idx = labelMatch[1] ? parseInt(labelMatch[1]) - 1 : 
+                                  labelMatch[2] ? parseInt(labelMatch[2]) - 1 :
+                                  labelMatch[3] ? labelMatch[3].toUpperCase().charCodeAt(0) - 65 : -1;
+                        if (idx >= 0 && idx < 4) {
+                            correctAnswerLabel = `O${idx + 1}`;
+                        }
+                    }
+                } else if (trimmed.startsWith('E:')) {
+                    explanation = trimmed.substring(2).trim();
+                } else if (trimmed.startsWith('D:')) {
                     const diff = trimmed.substring(2).trim().toLowerCase();
                     if (['easy', 'medium', 'hard'].includes(diff)) difficulty = diff;
                 }
             }
-            if (question && options.length === 4 && correctAnswer) {
-                questions.push({ question, options, correctAnswer, explanation, difficulty });
+
+            // Resolve correct answer text if it was a label, or vice-versa
+            let finalCorrectAnswer = correctAnswerText;
+            if (correctAnswerLabel) {
+                 const idx = parseInt(correctAnswerLabel.substring(1)) - 1;
+                 if (options[idx]) finalCorrectAnswer = options[idx];
+            } else {
+                // If the LLM returned text, try to find it in options to normalize
+                const foundIdx = options.findIndex(opt => 
+                    opt.toLowerCase().trim() === correctAnswerText.toLowerCase().trim() ||
+                    correctAnswerText.toLowerCase().trim().includes(opt.toLowerCase().trim())
+                );
+                if (foundIdx !== -1) finalCorrectAnswer = options[foundIdx];
+            }
+
+            if (question && options.length === 4 && finalCorrectAnswer) {
+                questions.push({ question, options, correctAnswer: finalCorrectAnswer, explanation, difficulty });
             }
         }
         return questions.slice(0, numQuestions);
