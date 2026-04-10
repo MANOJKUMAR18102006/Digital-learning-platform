@@ -8,6 +8,10 @@ import {
   getChatHistory,
   generateStudyPlan,
   analyzeQuiz,
+  explainSpoken,
+  generateNotes,
+  generateMindmap,
+  analyzePerformance,
 } from '../controllers/aiController.js';
 import protect from '../middleware/auth.js';
 
@@ -24,6 +28,10 @@ router.post('/chat', chat);
 router.post('/explain-concept', explainConcept);
 router.post('/generate-study-plan', generateStudyPlan);
 router.post('/analyze-quiz', analyzeQuiz);
+router.post('/explain-spoken', explainSpoken);
+router.post('/generate-notes', generateNotes);
+router.post('/generate-mindmap', generateMindmap);
+router.get('/analyze-performance', protect, analyzePerformance);
 router.get('/chat-history/:documentId', getChatHistory);
 
 export default router;

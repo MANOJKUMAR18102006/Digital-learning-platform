@@ -1,7 +1,7 @@
 import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { LayoutDashboard, FileText, User, LogOut, BrainCircuit, BookOpen, X, Sparkles } from 'lucide-react';
+import { LayoutDashboard, FileText, User, LogOut, BrainCircuit, BookOpen, X, Sparkles, Trophy, Award } from 'lucide-react';
 
 const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
     const { logout } = useAuth();
@@ -17,6 +17,8 @@ const Sidebar = ({ isSidebarOpen, toggleSidebar }) => {
         { to: '/documents', icon: FileText, text: 'Documents' },
         { to: '/flashcards', icon: BookOpen, text: 'Flashcards' },
         { to: '/study-plan', icon: Sparkles, text: 'Study Plan' },
+        { to: '/leaderboard', icon: Trophy, text: 'Leaderboard' },
+        { to: '/achievements', icon: Award, text: 'Achievements' },
         { to: '/profile', icon: User, text: 'Profile' },
     ];
 

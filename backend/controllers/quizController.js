@@ -1,4 +1,6 @@
 import Quiz from '../models/Quiz.js';
+import { awardXP, XP_RULES, checkAchievements } from '../utils/gamification.js';
+import { logActivity } from '../utils/activityLogger.js';
 
 /**
  * @desc    Get all quizzes for a document
@@ -121,6 +123,21 @@ export const submitQuiz = async (req, res, next) => {
 
         await quiz.save();
 
+        // 🏆 GAMIFICATION HOOKS
+        await awardXP(req.user._id, XP_RULES.QUIZ_COMPLETED);
+        
+        // Count quizzes to check for badges
+        const quizCount = await Quiz.countDocuments({ userId: req.user._id, completedAt: { $ne: null } });
+        const newBadges = await checkAchievements(req.user._id, { quizCount });
+
+        // Log Activity
+        await logActivity({
+            userId: req.user._id,
+            type: 'quiz_complete',
+            description: `Attempted and scored ${score}% on the quiz: ${quiz.title}`,
+            link: `/quizzes/${quiz._id}/results`
+        });
+
         res.status(200).json({
             success: true,
             data: {
@@ -129,9 +146,10 @@ export const submitQuiz = async (req, res, next) => {
                 correctCount,
                 totalQuestions: quiz.totalQuestions,
                 percentage: score,
-                userAnswers
+                userAnswers,
+                newBadges // Show user when they unlock something!
             },
-            message: 'Quiz submitted successfully'
+            message: 'Quiz submitted successfully. XP awarded!'
         });
 
     } catch (error) {

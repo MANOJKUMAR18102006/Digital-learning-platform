@@ -59,7 +59,7 @@ const StudyPlanPage = () => {
             <div className="bg-gradient-to-r from-emerald-600 to-teal-600 p-8 text-white">
                 <div className="flex items-center gap-3 mb-2">
                     <Sparkles className="w-6 h-6 animate-pulse" />
-                    <h2 className="text-2xl font-bold italic tracking-tight">AI Study Architect</h2>
+                    <h2 className="text-2xl font-bold tracking-tight">AI Study Architect</h2>
                 </div>
                 <p className="text-emerald-50/80 font-medium">Transform your learning goals into a masterpiece with precision planning.</p>
             </div>

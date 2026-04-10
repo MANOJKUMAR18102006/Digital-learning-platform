@@ -4,6 +4,8 @@ import Quiz from '../models/Quiz.js';
 import ChatHistory from '../models/ChatHistory.js';
 import * as geminiService from '../utils/groqService.js';
 import { findRelevantChunks } from '../utils/textChunker.js';
+import { awardXP, XP_RULES } from '../utils/gamification.js';
+import { logActivity } from '../utils/activityLogger.js';
 
 
 // 🔥 Normalize text (IMPORTANT FIX)
@@ -64,7 +66,18 @@ export const generateFlashcards = async (req, res, next) => {
         res.status(201).json({
             success: true,
             data: flashcardSet,
-            message: 'Flashcards generated successfully'
+            message: 'Flashcards generated successfully. XP awarded!'
+        });
+
+        // Award XP
+        await awardXP(req.user._id, XP_RULES.FLASHCARD_REVIEW);
+        
+        // Log Activity
+        await logActivity({
+            userId: req.user._id,
+            type: 'flashcards_gen',
+            description: `Generated a set of flashcards for ${document.title}`,
+            link: `/documents/${document._id}`
         });
 
     } catch (error) {
@@ -340,6 +353,14 @@ export const generateStudyPlan = async (req, res, next) => {
             message: 'Study plan generated successfully'
         });
 
+        // Log Activity
+        await logActivity({
+            userId: req.user._id,
+            type: 'studyplan_gen',
+            description: `Architected a study plan for ${document?.title || 'Document'}`,
+            link: `/study-plan`
+        });
+
     } catch (error) {
         console.error("❌ Study Plan Error:", error);
         next(error);
@@ -361,6 +382,143 @@ export const analyzeQuiz = async (req, res, next) => {
 
     } catch (error) {
         console.error("❌ Quiz Analysis Error:", error);
+        next(error);
+    }
+};
+
+// ================= SPOKEN EXPLANATION =================
+export const explainSpoken = async (req, res, next) => {
+    try {
+        const { text } = req.body;
+
+        if (!text) {
+            return res.status(400).json({ success: false, message: 'Text is required' });
+        }
+
+        const explanation = await geminiService.generateSpokenExplanation(text);
+
+        res.status(200).json({
+            success: true,
+            data: explanation,
+            message: 'Spoken explanation generated successfully'
+        });
+
+    } catch (error) {
+        console.error("❌ Spoken Explanation Error:", error);
+        next(error);
+    }
+};
+
+// ================= STUDY NOTES =================
+export const generateNotes = async (req, res, next) => {
+    try {
+        const { documentId } = req.body;
+
+        if (!documentId) {
+            return res.status(400).json({ success: false, error: 'Please provide documentId' });
+        }
+
+        const { document, error } = await checkDocument(documentId, req.user._id);
+
+        if (error) {
+            return res.status(404).json({ success: false, error });
+        }
+
+        const cleanText = normalizeText(document.extractedText);
+        const notes = await geminiService.generateStudyNotes(cleanText);
+
+        res.status(200).json({
+            success: true,
+            data: notes,
+            message: 'Study notes generated successfully. XP awarded!'
+        });
+
+        // Award XP
+        await awardXP(req.user._id, XP_RULES.STUDY_NOTE_GEN);
+
+        // Log Activity
+        await logActivity({
+            userId: req.user._id,
+            type: 'notes_gen',
+            description: `Created structured study notes for ${document.title}`,
+            link: `/documents/${document._id}`
+        });
+
+    } catch (error) {
+        console.error("❌ Study Notes Error:", error);
+        next(error);
+    }
+};
+
+// ================= MIND MAP =================
+export const generateMindmap = async (req, res, next) => {
+    try {
+        const { documentId } = req.body;
+
+        if (!documentId) {
+            return res.status(400).json({ success: false, error: 'Please provide documentId' });
+        }
+
+        const { document, error } = await checkDocument(documentId, req.user._id);
+
+        if (error) {
+            return res.status(404).json({ success: false, error });
+        }
+
+        const cleanText = normalizeText(document.extractedText);
+        const mindmap = await geminiService.generateMindMap(cleanText);
+
+        res.status(200).json({
+            success: true,
+            data: mindmap,
+            message: 'Mind map generated successfully. XP awarded!'
+        });
+
+        // Award XP
+        await awardXP(req.user._id, XP_RULES.MINDMAP_GEN);
+
+        // Log Activity
+        await logActivity({
+            userId: req.user._id,
+            type: 'mindmap_gen',
+            description: `Generated a structural mind map for ${document.title}`,
+            link: `/documents/${document._id}`
+        });
+
+    } catch (error) {
+        console.error("❌ Mind Map Error:", error);
+        next(error);
+    }
+};
+
+// ================= PERFORMANCE ANALYSIS =================
+export const analyzePerformance = async (req, res, next) => {
+    try {
+        const userId = req.user._id;
+
+        // Fetch quiz results for this user
+        const quizResults = await Quiz.find({ userId }).select('score totalQuestions createdAt title').sort({ createdAt: -1 }).limit(10);
+        
+        // Fetch document count
+        const docCount = await Document.countDocuments({ userId });
+
+        // Basic productivity data
+        const analysisData = {
+            quizResults,
+            docCount,
+            activityCount: quizResults.length + docCount
+        };
+
+        const analysis = await geminiService.analyzeOverallPerformance(analysisData);
+
+        res.status(200).json({
+            success: true,
+            data: analysis,
+            message: 'Performance analysis completed'
+        });
+
+    } catch (error) {
+        console.error("❌ Performance Analysis Error:", error);
         next(error);
     }
 };

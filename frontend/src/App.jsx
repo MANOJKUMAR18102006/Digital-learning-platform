@@ -12,6 +12,8 @@ import StudyPlanPage from './pages/StudyPlan/StudyPlanPage';
 import QuizTakePage from './pages/Quizzes/QuizTakePage';
 import QuizResultPage from './pages/Quizzes/QuizResultPage';
 import ProfilePage from './pages/Profile/ProfilePage';
+import LeaderboardPage from './pages/Dashboard/LeaderboardPage';
+import AchievementsPage from './pages/Dashboard/AchievementsPage';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import { useAuth } from './context/AuthContext';
 
@@ -44,6 +46,8 @@ const App = () => {
           <Route path="/quizzes/:quizId" element={<QuizTakePage />} />
           <Route path="/quizzes/:quizId/results" element={<QuizResultPage />} />
           <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/leaderboard" element={<LeaderboardPage />} />
+          <Route path="/achievements" element={<AchievementsPage />} />
         </Route>
 
         <Route path="*" element={<NotFoundPage />} />

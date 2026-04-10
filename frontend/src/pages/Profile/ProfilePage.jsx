@@ -3,7 +3,7 @@ import Spinner from "../../components/common/Spinner";
 import authService from "../../services/authService";
 import { useAuth } from "../../context/AuthContext";
 import toast from "react-hot-toast";
-import { User, Mail, Lock, Shield, Camera } from "lucide-react";
+import { User, Mail, Lock, Shield, Camera, Volume2, Mic } from "lucide-react";
 
 const ProfilePage = () => {
     const { user, updateUser } = useAuth();
@@ -14,6 +14,16 @@ const ProfilePage = () => {
     const [currentPassword, setCurrentPassword] = useState("");
     const [newPassword, setNewPassword] = useState("");
     const [confirmNewPassword, setConfirmNewPassword] = useState("");
+    const [isVoiceEnabled, setIsVoiceEnabled] = useState(() => {
+        return localStorage.getItem('voiceAssistantEnabled') !== 'false';
+    });
+
+    const toggleVoice = () => {
+        const newValue = !isVoiceEnabled;
+        setIsVoiceEnabled(newValue);
+        localStorage.setItem('voiceAssistantEnabled', newValue.toString());
+        toast.success(`Voice Assistant ${newValue ? 'enabled' : 'disabled'} globally`);
+    };
 
     useEffect(() => {
         const fetchProfile = async () => {
@@ -103,6 +113,43 @@ const ProfilePage = () => {
                             <p className="text-xs font-medium text-slate-400 uppercase tracking-wide">Email Address</p>
                             <p className="text-sm font-semibold text-slate-800 mt-0.5">{email}</p>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Learning Preferences Card */}
+            <div className="bg-white border border-slate-200 rounded-2xl p-6 mb-6 shadow-sm">
+                <div className="flex items-center justify-between mb-5">
+                    <div className="flex items-center gap-3">
+                        <div className="flex items-center justify-center h-9 w-9 rounded-xl bg-emerald-50 text-emerald-500">
+                            <Volume2 className="h-4 w-4" strokeWidth={2} />
+                        </div>
+                        <div>
+                            <h3 className="text-base font-semibold text-slate-900">Learning Preferences</h3>
+                            <p className="text-xs text-slate-400">Customize how your AI tutor interacts with you</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="space-y-4">
+                    <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl">
+                        <div className="flex items-center gap-3">
+                            <div className="flex items-center justify-center h-8 w-8 rounded-lg bg-white text-emerald-500 shadow-sm">
+                                <Mic className="h-4 w-4" />
+                            </div>
+                            <div>
+                                <p className="text-sm font-semibold text-slate-800">AI Voice Assistant</p>
+                                <p className="text-[11px] text-slate-400">Enable spoken explanations and voice input</p>
+                            </div>
+                        </div>
+                        <button
+                            onClick={toggleVoice}
+                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${isVoiceEnabled ? 'bg-emerald-500' : 'bg-slate-300'}`}
+                        >
+                            <span
+                                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isVoiceEnabled ? 'translate-x-6' : 'translate-x-1'}`}
+                            />
+                        </button>
                     </div>
                 </div>
             </div>

@@ -10,8 +10,18 @@ const getDashboardData = async () => {
   }
 };
 
+const getHeatmapData = async () => {
+  try {
+    const response = await axiosInstance.get(API_PATHS.PROGRESS.GET_HEATMAP);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { message: 'Failed to fetch heatmap data' };
+  }
+};
+
 const progressService = {
   getDashboardData,
+  getHeatmapData,
 };
 
 export default progressService;

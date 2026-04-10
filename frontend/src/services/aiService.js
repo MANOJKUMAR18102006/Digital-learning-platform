@@ -73,6 +73,42 @@ const analyzeQuiz = async (quizData) => {
     }
 };
 
+const explainSpoken = async (text) => {
+    try {
+        const response = await axiosInstance.post(API_PATHS.AI.EXPLAIN_SPOKEN, { text });
+        return response.data;
+    } catch (error) {
+        throw error.response?.data || { message: 'Failed to generate spoken explanation' };
+    }
+};
+
+const generateNotes = async (documentId) => {
+    try {
+        const response = await axiosInstance.post(API_PATHS.AI.GENERATE_NOTES, { documentId });
+        return response.data;
+    } catch (error) {
+        throw error.response?.data || { message: 'Failed to generate study notes' };
+    }
+};
+
+const generateMindmap = async (documentId) => {
+    try {
+        const response = await axiosInstance.post(API_PATHS.AI.GENERATE_MINDMAP, { documentId });
+        return response.data;
+    } catch (error) {
+        throw error.response?.data || { message: 'Failed to generate mind map' };
+    }
+};
+
+const analyzePerformance = async () => {
+    try {
+        const response = await axiosInstance.get(API_PATHS.AI.ANALYZE_PERFORMANCE);
+        return response.data;
+    } catch (error) {
+        throw error.response?.data || { message: 'Failed to analyze performance' };
+    }
+};
+
 const aiService = {
     generateFlashcards,
     generateQuiz,
@@ -82,6 +118,10 @@ const aiService = {
     getChatHistory,
     generateStudyPlan,
     analyzeQuiz,
+    explainSpoken,
+    generateNotes,
+    generateMindmap,
+    analyzePerformance,
 };
 
 export default aiService;

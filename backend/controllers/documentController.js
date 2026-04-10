@@ -1,4 +1,5 @@
 import Document from '../models/Document.js';
+import { logActivity } from '../utils/activityLogger.js';
 import Flashcard from '../models/Flashcard.js';
 import Quiz from '../models/Quiz.js';
 import {
@@ -62,6 +63,14 @@ export const uploadDocument = async (req, res, next) => {
       success: true,
       data: document,
       message: 'Document uploaded successfully. Processing in progress...'
+    });
+
+    // Log Activity
+    await logActivity({
+      userId: req.user._id,
+      type: 'document_upload',
+      description: `Uploaded a new document: ${document.title}`,
+      link: `/documents/${document._id}`
     });
   } catch (error) {
     // Clean up file on error

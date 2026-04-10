@@ -234,3 +234,100 @@ Quiz Performance Analysis:`;
         throw new Error('Failed to analyze quiz results');
     }
 };
+
+export const generateSpokenExplanation = async (text) => {
+    try {
+        const prompt = `Convert the following study material into a clear, spoken-friendly explanation.
+
+Text:
+${text.substring(0, 2000)}
+
+Instructions:
+- Use simple, conversational language.
+- Break into short sentences for natural listening.
+- Add natural pauses (using commas or periods).
+- Avoid complex jargon or complex bullet points that are hard to hear.
+- Keep it under 150 words.
+
+Speech-friendly explanation:`;
+
+        return await generate(prompt);
+    } catch (error) {
+        console.error('Groq generateSpokenExplanation error:', error);
+        throw new Error('Failed to generate spoken explanation');
+    }
+};
+
+export const generateStudyNotes = async (text) => {
+    try {
+        const prompt = `Summarize the following content into clear, structured study notes.
+
+Content:
+${text.substring(0, 4000)}
+
+Instructions:
+- Convert the text into structured bullet points.
+- Use bold headings for main topics.
+- Use sub-bullets for supporting details and definitions.
+- Keep it concise and easy to revise.
+- Highlight key formulas, dates, or names if present.
+- Format the output in high-quality Markdown.
+
+Organized Study Notes:`;
+
+        return await generate(prompt);
+    } catch (error) {
+        console.error('Groq generateStudyNotes error:', error);
+        throw new Error('Failed to generate study notes');
+    }
+};
+
+export const generateMindMap = async (text) => {
+    try {
+        const prompt = `Create a detailed mind map structure for the following content.
+
+Content:
+${text.substring(0, 4000)}
+
+Instructions:
+- Identify the central main topic.
+- Break it down into clear subtopics and logical branches.
+- Show relationships between concepts.
+- Use a clear hierarchical tree structure (Main → Subtopics → Supporting Points).
+- Use indentation (2 spaces) for hierarchy.
+- Use emojis to represent different branches (e.g., 🚀, 💡, 🛡️).
+- Format the output in high-quality Markdown.
+
+Hierarchical Mind Map Tree:`;
+
+        return await generate(prompt);
+    } catch (error) {
+        console.error('Groq generateMindMap error:', error);
+        throw new Error('Failed to generate mind map');
+    }
+};
+
+export const analyzeOverallPerformance = async (data) => {
+    try {
+        const prompt = `Analyze the student's learning performance and productivity based on the following data.
+
+Performance Data:
+- Quiz Results: ${JSON.stringify(data.quizResults)}
+- Study Consistency (Documents Accessed): ${data.docCount}
+- Overall Activity count: ${data.activityCount}
+
+Instructions:
+1. Calculate a Productivity Score (0-100) based on quiz accuracy, consistency, and activity volume.
+2. Provide a breakdown of topic-wise accuracy if multiple topics are present.
+3. Identify improvement trends or areas of struggle.
+4. Suggest 2-3 specific actions the student should take next.
+5. Format the output in high-quality Markdown with a "Productivity Score" card at the top.
+
+Analysis Report:`;
+
+        return await generate(prompt);
+    } catch (error) {
+        console.error('Groq analyzeOverallPerformance error:', error);
+        throw new Error('Failed to analyze overall performance');
+    }
+};

@@ -21,6 +21,10 @@ export const API_PATHS = {
         GENERATE_SUMMARY: "/api/ai/generate-summary",
         GENERATE_STUDY_PLAN: "/api/ai/generate-study-plan",
         ANALYZE_QUIZ: "/api/ai/analyze-quiz",
+        EXPLAIN_SPOKEN: "/api/ai/explain-spoken",
+        GENERATE_NOTES: "/api/ai/generate-notes",
+        GENERATE_MINDMAP: "/api/ai/generate-mindmap",
+        ANALYZE_PERFORMANCE: "/api/ai/analyze-performance",
         CHAT: "/api/ai/chat",
         EXPLAIN_CONCEPT: "/api/ai/explain-concept",
         GET_CHAT_HISTORY: (documentId) => `/api/ai/chat-history/${documentId}`,
@@ -41,6 +45,11 @@ export const API_PATHS = {
     },
     PROGRESS: {
         GET_DASHBOARD: "/api/progress/dashboard",
+        GET_HEATMAP: "/api/progress/heatmap",
+    },
+    NOTIFICATIONS: {
+        GET_ALL: "/api/notifications",
+        MARK_READ: "/api/notifications/read",
     },
 };
 
