@@ -25,8 +25,8 @@ const FlashcardPage = () => {
   const fetchFlashcards = async () => {
     try {
       const response = await flashcardService.getFlashcardsForDocument(documentId);
-      setFlashcardSets(response.data[0]);
-      setFlashcards(response.data[0].cards || []);
+      setFlashcardSets(response.data[0] || null);
+      setFlashcards(response.data[0]?.cards || []);
     } catch (error) {
       toast.error("Failed to fetch flashcards.");
       console.error(error);
@@ -115,51 +115,75 @@ const FlashcardPage = () => {
   }
 
   return (
-    <>
-      <PageHeader title="Flashcards">
-        <div className="">
-          {!loading &&
-            (flashcards.length > 0 ? (
-              <Button onClick={() => setIsDeleteModalOpen(true)} disabled={deleting}>
-                <Trash2 size={16} /> Delete Set
-              </Button>
-            ) : (
-              <Button onClick={handleGenerateFlashcards} disabled={generating}>
-                {generating ? (
-                  <Spinner />
-                ) : (
-                  <><Plus size={16} /> Generate Flashcards</>
-                )}
-              </Button>
-            ))}
+    <div className="min-h-[calc(100vh-64px)] bg-slate-50/50">
+      <PageHeader title={flashcardSets?.documentId?.title || "Flashcards"}>
+        <div className="flex items-center gap-3">
+          <Link to="/flashcards">
+            <Button variant="secondary" size="sm" className="hidden sm:flex items-center gap-2">
+              <ArrowLeft size={16} /> Back to Sets
+            </Button>
+          </Link>
+          {flashcards.length > 0 && (
+            <Button 
+              onClick={() => setIsDeleteModalOpen(true)} 
+              variant="danger" 
+              size="sm"
+              className="flex items-center gap-2 bg-red-50 text-red-600 border-red-100 hover:bg-red-600 hover:text-white"
+              disabled={deleting}
+            >
+              <Trash2 size={16} /> Delete Set
+            </Button>
+          )}
         </div>
       </PageHeader>
-      <div className="">
-        <div className="">
-          <Flashcard flashcard={currentCard} onToggleStar={handleToggleStar} />
-        </div>
-        <div className="">
-          <Button
-            onClick={handlePrevCard}
-            variant="secondary"
-            disabled={flashcards.length <= 1}
-          >
-            <ChevronLeft size={16} /> Previous
-          </Button>
-          <span className="">
-            {currentCardIndex + 1} / {flashcards.length}
-          </span>
-          <Button
-            onClick={handleNextCard}
-            variant="secondary"
-            disabled={flashcards.length <= 1}
-          >
-            Next <ChevronRight size={16} />
-          </Button>
+
+      <div className="max-w-4xl mx-auto px-4 py-12">
+        <div className="flex flex-col items-center gap-10">
+          {/* Card Container */}
+          <div className="w-full max-w-2xl transform transition-all duration-500 hover:scale-[1.01]">
+            <Flashcard flashcard={currentCard} onToggleStar={handleToggleStar} />
+          </div>
+          {/* Controls */}
+          <div className="flex flex-col items-center gap-8 w-full">
+            <div className="flex items-center justify-between w-full max-w-md bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
+              <Button
+                onClick={handlePrevCard}
+                variant="secondary"
+                disabled={flashcards.length <= 1}
+                className="w-12 h-12 !p-0 rounded-xl flex items-center justify-center hover:bg-slate-100 transition-colors"
+                title="Previous Card"
+              >
+                <ChevronLeft size={24} />
+              </Button>
+
+              <div className="flex flex-col items-center">
+                <span className="text-xl font-bold text-slate-900 leading-none">
+                  {currentCardIndex + 1}
+                </span>
+                <span className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">
+                  of {flashcards.length}
+                </span>
+              </div>
+
+              <Button
+                onClick={handleNextCard}
+                variant="secondary"
+                disabled={flashcards.length <= 1}
+                className="w-12 h-12 !p-0 rounded-xl flex items-center justify-center hover:bg-slate-100 transition-colors"
+                title="Next Card"
+              >
+                <ChevronRight size={24} />
+              </Button>
+            </div>
+
+            {/* Hint / Tip */}
+            <div className="text-center text-slate-400 text-sm animate-pulse">
+              Tip: Press space to flip the card or arrow keys to navigate
+            </div>
+          </div>
         </div>
       </div>
 
-      {renderFlashcardcontent()}
       <Modal
         isOpen={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}
@@ -189,7 +213,7 @@ const FlashcardPage = () => {
           </div>
         </div>
       </Modal>
-    </>
+    </div>
   );
 };
 
