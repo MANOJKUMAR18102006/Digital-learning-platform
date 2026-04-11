@@ -4,7 +4,7 @@ import Quiz from '../models/Quiz.js';
 import ChatHistory from '../models/ChatHistory.js';
 import * as geminiService from '../utils/groqService.js';
 import { findRelevantChunks } from '../utils/textChunker.js';
-import { awardXP, XP_RULES } from '../utils/gamification.js';
+import { awardXP, XP_RULES, checkAchievements } from '../utils/gamification.js';
 import { logActivity } from '../utils/activityLogger.js';
 
 
@@ -79,6 +79,9 @@ export const generateFlashcards = async (req, res, next) => {
             description: `Generated a set of flashcards for ${document.title}`,
             link: `/documents/${document._id}`
         });
+
+        // 🏆 Check for new achievements
+        await checkAchievements(req.user._id);
 
     } catch (error) {
         console.error("❌ Flashcard Error:", error);

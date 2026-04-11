@@ -127,8 +127,7 @@ export const submitQuiz = async (req, res, next) => {
         await awardXP(req.user._id, XP_RULES.QUIZ_COMPLETED);
         
         // Count quizzes to check for badges
-        const quizCount = await Quiz.countDocuments({ userId: req.user._id, completedAt: { $ne: null } });
-        const newBadges = await checkAchievements(req.user._id, { quizCount });
+        const newBadges = await checkAchievements(req.user._id);
 
         // Log Activity
         await logActivity({

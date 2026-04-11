@@ -4,6 +4,7 @@ import Flashcard from '../models/Flashcard.js';
 import Quiz from '../models/Quiz.js';
 import User from '../models/User.js';
 import ActivityLog from '../models/ActivityLog.js';
+import { checkAchievements } from '../utils/gamification.js';
 
 /**
  * @desc    Get user learning statistics
@@ -154,6 +155,29 @@ export const getHeatmapData = async (req, res, next) => {
         res.status(200).json({
             success: true,
             data: heatmapData
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+/**
+ * @desc    Sync and calculate achievements (Manual Refresh)
+ * @route   POST api/progress/achievements/sync
+ * @access  Private
+ */
+export const syncAchievements = async (req, res, next) => {
+    try {
+        const newBadges = await checkAchievements(req.user.id);
+        
+        res.status(200).json({
+            success: true,
+            data: {
+                newBadges
+            },
+            message: newBadges.length > 0 
+                ? `Successfully synced! You unlocked ${newBadges.length} new badges.`
+                : 'Achievements are already up to date.'
         });
     } catch (error) {
         next(error);

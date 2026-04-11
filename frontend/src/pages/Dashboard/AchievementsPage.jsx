@@ -11,10 +11,20 @@ const AchievementsPage = () => {
     useEffect(() => {
         const fetchAchievements = async () => {
             try {
+                // First, sync with backend to catch any missed achievements
+                await axiosInstance.post('/api/progress/achievements/sync');
+                
                 const response = await axiosInstance.get('/api/progress/achievements');
                 setAchievements(response.data.data);
             } catch (error) {
-                toast.error('Failed to load achievements.');
+                console.error('Sync error:', error);
+                // Fallback: try to load what we have even if sync fails
+                try {
+                    const response = await axiosInstance.get('/api/progress/achievements');
+                    setAchievements(response.data.data);
+                } catch (innerError) {
+                    toast.error('Failed to load achievements.');
+                }
             } finally {
                 setLoading(false);
             }

@@ -1,6 +1,7 @@
 
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
+import { updateStreak, awardXP, XP_RULES } from '../utils/gamification.js';
 
 const generateToken = (id) =>
   jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -29,6 +30,10 @@ export const register = async (req, res, next) => {
       email,
       password,
     });
+
+    // Initialize streak and award first login XP
+    await updateStreak(user._id);
+    await awardXP(user._id, XP_RULES.DAILY_LOGIN);
 
     const token = generateToken(user._id);
     res.status(201).json({
@@ -98,6 +103,11 @@ export const login = async (req, res, next) => {
       },
       token,
     });
+
+    // Update streak and award daily XP on login
+    await updateStreak(user._id);
+    await awardXP(user._id, XP_RULES.DAILY_LOGIN);
+
   } catch (error) {
     next(error);
   }

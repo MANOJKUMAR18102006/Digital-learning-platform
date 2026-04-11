@@ -33,20 +33,71 @@ export const awardXP = async (userId, amount) => {
     }
 };
 
-export const checkAchievements = async (userId, stats) => {
+export const updateStreak = async (userId) => {
+    try {
+        const user = await User.findById(userId);
+        if (!user) return null;
+
+        const now = new Date();
+        const lastLogin = user.lastLoginDate;
+        
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const last = lastLogin ? new Date(lastLogin.getFullYear(), lastLogin.getMonth(), lastLogin.getDate()) : null;
+
+        if (!last) {
+            user.streak = 1;
+        } else {
+            const diffTime = today.getTime() - last.getTime();
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+            if (diffDays === 1) {
+                user.streak += 1;
+            } else if (diffDays > 1) {
+                user.streak = 1;
+            }
+            // If diffDays is 0, they already logged in today, keep streak as is
+        }
+
+        user.lastLoginDate = now;
+        await user.save();
+
+        // Check for streak-related achievements
+        if (user.streak >= 7) {
+            await checkAchievements(userId);
+        }
+
+        return user.streak;
+    } catch (error) {
+        console.error('updateStreak error:', error);
+        return 0;
+    }
+};
+
+export const checkAchievements = async (userId, stats = null) => {
     try {
         const user = await User.findById(userId);
         if (!user) return [];
+
+        // If stats weren't provided, fetch them all for a full sync
+        if (!stats) {
+            const Quiz = (await import('../models/Quiz.js')).default;
+            const Flashcard = (await import('../models/Flashcard.js')).default;
+            
+            stats = {
+                quizCount: await Quiz.countDocuments({ userId, completedAt: { $ne: null } }),
+                flashcardCount: await Flashcard.countDocuments({ userId }) // Or more complex logic
+            };
+        }
 
         const newAchievements = [];
         const existingNames = user.achievements.map(a => a.name);
 
         const badgeConfigs = [
-            { name: 'Bronze Scholar', criteria: stats.quizCount >= 5, description: 'Completed 5 quizzes', icon: '🥉' },
-            { name: 'Silver Scholar', criteria: stats.quizCount >= 10, description: 'Completed 10 quizzes', icon: '🥈' },
-            { name: 'Gold Scholar', criteria: stats.quizCount >= 25, description: 'Completed 25 quizzes', icon: '🥇' },
-            { name: 'Flashcard Pro', criteria: stats.flashcardCount >= 10, description: 'Reviewed 10 flashcard sets', icon: '🧠' },
-            { name: 'Consistency King', criteria: user.streak >= 7, description: 'Maintain a 7-day study streak', icon: '🔥' },
+            { name: 'Bronze Scholar', criteria: (stats.quizCount || 0) >= 5, description: 'Completed 5 quizzes', icon: '🥉' },
+            { name: 'Silver Scholar', criteria: (stats.quizCount || 0) >= 10, description: 'Completed 10 quizzes', icon: '🥈' },
+            { name: 'Gold Scholar', criteria: (stats.quizCount || 0) >= 25, description: 'Completed 25 quizzes', icon: '🥇' },
+            { name: 'Flashcard Pro', criteria: (stats.flashcardCount || 0) >= 10, description: 'Created 10 flashcard sets', icon: '🧠' },
+            { name: 'Consistency King', criteria: (user.streak || 0) >= 7, description: 'Maintain a 7-day study streak', icon: '🔥' },
         ];
 
         for (const badge of badgeConfigs) {
@@ -54,7 +105,8 @@ export const checkAchievements = async (userId, stats) => {
                 user.achievements.push({
                     name: badge.name,
                     description: badge.description,
-                    icon: badge.icon
+                    icon: badge.icon,
+                    unlockedAt: new Date()
                 });
                 newAchievements.push(badge);
             }
