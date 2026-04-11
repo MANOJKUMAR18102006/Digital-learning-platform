@@ -284,21 +284,31 @@ Organized Study Notes:`;
 
 export const generateMindMap = async (text) => {
     try {
-        const prompt = `Create a detailed mind map structure for the following content.
+        const prompt = `Create a detailed mind map for the following content using Mermaid.js syntax.
+Use the "mindmap" diagram type.
 
 Content:
 ${text.substring(0, 4000)}
 
 Instructions:
-- Identify the central main topic.
-- Break it down into clear subtopics and logical branches.
-- Show relationships between concepts.
-- Use a clear hierarchical tree structure (Main → Subtopics → Supporting Points).
-- Use indentation (2 spaces) for hierarchy.
-- Use emojis to represent different branches (e.g., 🚀, 💡, 🛡️).
-- Format the output in high-quality Markdown.
+- Use the Mermaid.js "mindmap" syntax.
+- Start with "mindmap".
+- Use indentation for hierarchy.
+- Include a central topic and at least 3-5 main branches.
+- Use icons if possible (Mermaid supports some markdown-like icons or strings).
+- DO NOT use code blocks in your response, just the Mermaid code.
+- Ensure the syntax is valid.
 
-Hierarchical Mind Map Tree:`;
+Example:
+mindmap
+  root((Central Topic))
+    Branch 1
+      Sub-branch 1.1
+      Sub-branch 1.2
+    Branch 2
+      Sub-branch 2.1
+
+Mermaid Mindmap Code:`;
 
         return await generate(prompt);
     } catch (error) {
@@ -306,6 +316,7 @@ Hierarchical Mind Map Tree:`;
         throw new Error('Failed to generate mind map');
     }
 };
+
 
 export const analyzeOverallPerformance = async (data) => {
     try {
