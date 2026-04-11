@@ -202,6 +202,7 @@ Please ensure the study plan specifically references and covers the material fou
 - Use bold text for time slots and topics.
 - Use bullet points for specific sub-tasks.
 - Add a concluding section with "AI Tutor Tips" for success.
+- STRICT RULE: DO NOT use raw HTML or inline CSS. Use standard Markdown only.
 
 Personalized Study Plan:`;
 
@@ -225,6 +226,7 @@ Instructions:
 - Suggest specific improvement actions for each (e.g., specific revision, practice, flashcards).
 - Provide the analysis in high-quality Markdown.
 - End with a summary call to action.
+- STRICT RULE: DO NOT use raw HTML or inline CSS. Use standard Markdown only.
 
 Quiz Performance Analysis:`;
 
@@ -272,6 +274,7 @@ Instructions:
 - Keep it concise and easy to revise.
 - Highlight key formulas, dates, or names if present.
 - Format the output in high-quality Markdown.
+- STRICT RULE: DO NOT use raw HTML or inline CSS. Use standard Markdown only.
 
 Organized Study Notes:`;
 
@@ -332,7 +335,8 @@ Instructions:
 2. Provide a breakdown of topic-wise accuracy if multiple topics are present.
 3. Identify improvement trends or areas of struggle.
 4. Suggest 2-3 specific actions the student should take next.
-5. Format the output in high-quality Markdown with a "Productivity Score" card at the top.
+5. Format the output in high-quality Markdown. Use a prominent blockquote (>) for the "Productivity Score" section at the top to give it a card-like feel. 
+6. STRICT RULE: DO NOT use any raw HTML tags (like <div>, <a>, <span>) or inline CSS styles. Use standard Markdown syntax only.
 
 Analysis Report:`;
 

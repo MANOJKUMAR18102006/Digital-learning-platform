@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import rehypeRaw from 'rehype-raw';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { dracula } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
@@ -9,6 +10,7 @@ const MarkdownRenderer = ({ content }) => {
     <div className="text-neutral-700">
     <ReactMarkdown
       remarkPlugins={[remarkGfm]}
+      rehypePlugins={[rehypeRaw]}
       components={{
         h1: ({ node, ...props }) => <h1 className="text-2xl font-bold text-slate-900 mt-6 mb-3" {...props} />,
         h2: ({ node, ...props }) => <h2 className="text-xl font-semibold text-slate-800 mt-5 mb-2" {...props} />,
@@ -18,7 +20,9 @@ const MarkdownRenderer = ({ content }) => {
         ol: ({ node, ...props }) => <ol className="list-decimal list-inside space-y-1 my-3 text-slate-700" {...props} />,
         strong: ({ node, ...props }) => <strong className="font-semibold text-slate-900" {...props} />,
         em: ({ node, ...props }) => <em className="italic text-slate-600" {...props} />,
-        blockquote: ({ node, ...props }) => <blockquote className="border-l-4 border-emerald-400 pl-4 py-1 my-3 text-slate-600 bg-emerald-50 rounded-r-lg" {...props} />,
+        blockquote: ({ node, ...props }) => (
+          <blockquote className="border-l-4 border-emerald-500/50 pl-6 py-4 my-6 backdrop-blur-sm bg-emerald-50/50 rounded-r-2xl shadow-sm italic text-slate-700" {...props} />
+        ),
         code: ({ node, inline, className, children, ...props }) => {
           const match = /language-([\w-]+)/.exec(className || '');
           return !inline && match ? (
